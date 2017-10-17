@@ -1,0 +1,93 @@
+apply plugin: 'org.springframework.boot'
+apply from: 'https://dl.bintray.com/scalding/generic/waroverlay.gradle'
+apply from: 'https://raw.githubusercontent.com/apereo/cas/5.2.x/gradle/overrides.gradle'
+
+apply plugin: 'eclipse'
+apply plugin: 'idea'
+
+eclipse {
+    classpath {
+       downloadSources = true
+       downloadJavadoc = true
+    }
+}
+
+idea {
+    module {
+        downloadJavadoc = true
+        downloadSources = true
+    }
+}
+
+bootRepackage {
+    mainClass = "org.apereo.cas.mgmt.web.CasManagementWebApplication"
+    executable = true
+}
+
+bootRun {
+    addResources = true
+}
+
+repositories {
+    mavenLocal()
+    jcenter()
+    maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
+    maven { url 'https://build.shibboleth.net/nexus/content/repositories/releases/' }
+}
+
+dependencies {
+    compile "org.apereo.cas:cas-management-webapp:${project.'cas.version'}@war"
+}
+
+task copyConfig(type: Copy, description: "Copy CAS configuration over to /etc/cas/config") {
+    doLast {
+        from "${project.rootDir}/etc/cas/config"
+        into '/etc/cas/config'
+
+        println "Copied configuration files into /etc/cas/config"
+    }
+}
+
+war {
+    dependsOn copyConfig
+    baseName = 'cas-management'
+    includeWarJars = true
+    entryCompression = ZipEntryCompression.STORED
+}
+
+task explodeWar(type: Copy, group: "build", description: "Explodes the cas-management.war") {
+    doLast {
+        from zipTree(project.war.outputs.files.singleFile)
+        into "${buildDir}/cas-management"
+        println "CAS web application artifact exploded into [cas-management/build/cas-management]"
+    }
+}
+
+task run(group: "build", description: "Run the CAS management web application in embedded container mode") {
+    dependsOn build
+    doLast {
+        def casRunArgs = Arrays.asList(project.'cas.run.jvmArgs'.split(" "))
+        javaexec {
+            main = "-jar";
+            jvmArgs = casRunArgs
+            args = ["build/libs/cas-management.war"]
+            
+            log.info "Started ${commandLine}"
+        }
+    }
+}
+
+task debug(group: "build", description: "Debug the CAS management web application in embedded mode on port 5005") {
+    dependsOn build
+    doLast {
+        def casDebugArgs = Arrays.asList(project.'cas.debug.jvmArgs'.split(" "))
+
+        javaexec {
+            main = "-jar";
+            jvmArgs = casDebugArgs
+            args = ["build/libs/cas-management.war"]
+            
+            log.info "Started ${commandLine}"
+        }
+    }
+}
