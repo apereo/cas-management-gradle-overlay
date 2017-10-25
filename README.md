@@ -1,7 +1,6 @@
 CAS Gradle Overlay
 ============================
-Generic CAS gradle war overlay to exercise the latest versions of CAS. This overlay could be freely
-used as a starting template for local CAS gradle war overlays.
+Generic CAS gradle war overlay to exercise the latest versions of CAS. The Apache Maven equivalent of this overlay [is available here](https://github.com/apereo/cas-services-management-overlay).
 
 ## Versions
 
