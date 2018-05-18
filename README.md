@@ -4,7 +4,7 @@ Generic CAS gradle war overlay to exercise the latest versions of CAS. The Apach
 
 ## Versions
 
-* CAS `5.2.x`
+* CAS `5.3.x`
 
 ## Requirements
 
