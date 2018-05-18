@@ -50,7 +50,7 @@ Note: A number of options can be made default in `gradle.properties`. For exampl
 If you are on a `SNAPSHOT` version, you can force re-downloads of modules/dependencies:
 
 ```bash
- ./gradlew[.bat] clean build --parallel --refresh-dependencies
+./gradlew[.bat] clean build --parallel --refresh-dependencies
 ```
 
 ### Clear Gradle Cache
@@ -90,15 +90,16 @@ Or:
 
 ## Deployment
 
-- Create a keystore file `thekeystore` under `/etc/cas` on Linux. Use `c:/etc/cas` on Windows.
+- Create a keystore file `thekeystore` under `/etc/cas` on Linux. Use `C:/etc/cas` on Windows.
 - Use the password `changeit` for both the keystore and the key/certificate entries.
 - Ensure the keystore is loaded up with keys and certificates of the server.
-    - Add the following to `./etc/cas/config/cas.properties`:
-    ```
-    server.ssl.keyStore=file:/etc/cas/thekeystore
-    server.ssl.keyStorePassword=changeit
-    server.ssl.keyPassword=changeit
-    ```
+- Add the following to `./etc/cas/config/management.properties`:
+    
+```properties
+server.ssl.keyStore=file:/etc/cas/thekeystore
+server.ssl.keyStorePassword=changeit
+server.ssl.keyPassword=changeit
+```
 
 On a successful deployment via the following methods, CAS will be available at:
 
@@ -134,7 +135,7 @@ Be careful with this method of deployment. `bootRun` is not designed to work wit
 
 ### External
 
-Deploy resultant `cas/build/libs/cas.war` to a servlet container of choice.
+Deploy resultant `cas-management/build/libs/cas-management.war` to a servlet container of choice.
 
 ## Troubleshooting
 
