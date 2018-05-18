@@ -1,169 +1,43 @@
-CAS Gradle Overlay
+CAS Management Overlay
 ============================
-Generic CAS gradle war overlay to exercise the latest versions of CAS. The Apache Maven equivalent of this overlay [is available here](https://github.com/apereo/cas-services-management-overlay).
 
-## Versions
+CAS management web application Maven overlay for CAS with externalized configuration. The Apache Maven equivalent of this overlay is [available here](https://github.com/apereo/cas-management-overlay).
 
-* CAS `5.3.x`
+# Versions
 
-## Requirements
+```xml
+<cas.version>5.3.x</cas.version>
+```
+
+# Requirements
 
 * JDK 1.8+
 
-## Configuration
+# Build
 
-The `etc` directory contains the configuration files that are copied to `/etc/cas/config`  automatically.
-
-## Adding Modules
-
-CAS modules may be specified under the `dependencies` block of the [CAS subproject](cas/build.gradle):
-
-```gradle
-dependencies {
-    compile "org.apereo.cas:cas-management-webapp:${project.'cas.version'}@war"
-    compile "org.apereo.cas:cas-server-some-module:${project.'cas.version'}"
-    ...
-}
-```
-
-Study material:
-
-- https://docs.gradle.org/current/userguide/artifact_dependencies_tutorial.html
-- https://docs.gradle.org/current/userguide/dependency_management.html
-
-## Build
+To see what commands are available to the build script, run:
 
 ```bash
-./gradlew[.bat] clean build
+./build.sh help
 ```
 
-Faster builds on subsequent attempts once modules/dependencies are resolved:
+To package the final web application, run:
 
 ```bash
-./gradlew[.bat] clean build --parallel --offline
+./build.sh package
 ```
 
-Note: A number of options can be made default in `gradle.properties`. For example, `--parallel` can be defaulted via  `org.gradle.parallel=true`.
-
-### Updating SNAPSHOT Builds
-
-If you are on a `SNAPSHOT` version, you can force re-downloads of modules/dependencies:
+To update `SNAPSHOT` versions run:
 
 ```bash
-./gradlew[.bat] clean build --parallel --refresh-dependencies
+./build.sh package -U
 ```
 
-### Clear Gradle Cache
+## Windows Build
 
-If you need to, on Linux/Unix systems, you can delete all the existing artifacts (artifacts and metadata)
-Gradle has downloaded using:
+On Windows you can run build.cmd instead of build.sh. The usage may differ from `build.sh`; run `build.cmd help` for usage.
 
-```bash
-# Only do this when absolutely necessary!
-rm -rf $HOME/.gradle/caches/
-```
+## Note
 
-Same strategy applies to Windows too, provided you switch `$HOME` to its equivalent in the above command.
-
-### Build Tasks
-
-To see what commands are available in the build, use:
-
-```bash
- ./gradlew[.bat] tasks
-```
-
-### Project Dependencies
-
-To see where certain dependencies come from in the build:
-
-```bash
-# Show the surrounding 2 before/after lines once a match is found
- ./gradlew[.bat] allDependencies | grep -A 2 -B 2 xyz
-```
-
-Or:
-
-```bash
-./gradlew[.bat] allDependenciesInsight --configuration [compile|runtime] --dependency xyz
-```
-
-## Deployment
-
-- Create a keystore file `thekeystore` under `/etc/cas` on Linux. Use `C:/etc/cas` on Windows.
-- Use the password `changeit` for both the keystore and the key/certificate entries.
-- Ensure the keystore is loaded up with keys and certificates of the server.
-- Add the following to `./etc/cas/config/management.properties`:
-    
-```properties
-server.ssl.keyStore=file:/etc/cas/thekeystore
-server.ssl.keyStorePassword=changeit
-server.ssl.keyPassword=changeit
-```
-
-On a successful deployment via the following methods, CAS will be available at:
-
-* `http://cas.server.name:8080/cas`
-* `https://cas.server.name:8443/cas`
-
-### Executable WAR
-
-Run the CAS web application as an executable WAR.
-
-```bash
-java -jar cas/build/libs/cas.war
-```
-
-Or via Gradle:
-
-```bash
-# You need to check your project path into cas/build.gradle for this command
-./gradlew[.bat] run
-```
-
-### Spring Boot
-
-Run the CAS web application as an executable WAR via Spring Boot. This is most useful during development and testing.
-
-```bash
-./gradlew[.bat] bootrun
-```
-
-#### Warning!
-
-Be careful with this method of deployment. `bootRun` is not designed to work with already executable WAR artifacts such that CAS server web application. YMMV. Today, uses of this mode ONLY work when there is **NO OTHER** dependency added to the build script and the `cas-server-webapp` is the only present module. See [this issue](https://github.com/apereo/cas/issues/2334) and [this issue](https://github.com/spring-projects/spring-boot/issues/8320) for more info.
-
-### External
-
-Deploy resultant `cas-management/build/libs/cas-management.war` to a servlet container of choice.
-
-## Troubleshooting
-
-You can also run the CAS server in `DEBUG` mode to step into the code via an IDE that is able to connect to the port `5005`.
-
-```bash
-./gradlew[.bat] debug
-```
-
-To setup a development environment for either eclipse or IDEA:
-
-```bash
-# ./gradlew[.bat] eclipse
-# ./gradlew[.bat] idea
-```
-
-The above tasks help to setup a project for your development environment. If you find that something has gone wrong, you can always start anew by using the following:
-
-```bash
-# ./gradlew[.bat] cleanEclipse
-# ./gradlew[.bat] cleanIdea
-```
-
-## Explode WAR
-
-You may explode/unzip the generated CAS web application if you wish to peek into the artifact
-to examine dependencies, configuration files and such that are merged as part of the overlay build process.
-
-```bash
-./gradlew[.bat] explodeWar
-```
+If you are running the management web application on the same machine as the CAS server web application itself,
+you will need to evaluate the build script and make sure the configuration files don't override each other.
